@@ -64,7 +64,7 @@ if __name__ == '__main__':
         data = get_specific_num(num)
 
         lossi = []
-
+        
         for i in tqdm(range(epochs)):
             Xt, times, epsilons = get_batch(data)
             ep_pred = model(Xt, times)

@@ -1,7 +1,10 @@
 import torch
 import matplotlib.pyplot as plt
+import matplotlib.animation as anime
 from config import *
 from model import DiffusionModel
+
+PLAY_ANIMATION = False
 
 while True:
     num = input("Please enter the number you want to generate(0 - 9), enter q to quit:")
@@ -20,7 +23,25 @@ while True:
 
     model_t.eval()
 
-    X_last = model_t.generate()
+    X_series = model_t.generate()
+    X_series = [x.cpu().detach().view(28, 28) for x in X_series]
 
-    plt.imshow(X_last.view(28, 28).cpu().detach())
+    if PLAY_ANIMATION: 
+        #Generate animation
+        fig, ax = plt.subplots()
+        ax.set_axis_off()
+        im = ax.imshow(X_series[0])
+
+        def update(i):
+            im.set_data(X_series[i])
+            return [im]
+
+        ani = anime.FuncAnimation(
+            fig, update,
+            frames = len(X_series),
+            interval= 1,
+            blit=True
+        )
+    else:
+        plt.imshow(X_series[-1])
     plt.show()

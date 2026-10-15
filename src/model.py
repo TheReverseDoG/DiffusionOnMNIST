@@ -39,18 +39,21 @@ class DiffusionModel(nn.Module):
 
         X_current = torch.randn((1, 784), device=device)
         X_last = torch.zeros((1, 784), device=device)
+        X_series = [X_current]
         T = time - 1
         for i in range(time):
             t = torch.tensor(T, device=device).view(1)
             epsilon = self.forward(X_current, t)
-
+            
             if T == 0:
                 break
 
             mu = (1 / (1 - beta[T].item()) ** 0.5) * (X_current - (beta[T].item() / (1 - alpha[t]) ** 0.5) * epsilon)
             std = beta[T].item() ** 0.5
             X_last = mu + std * torch.randn((1, 784), device=device)
-
+            
             X_current = X_last
+            X_series.append(X_current)
             T -= 1
-        return X_last
+        X_series.append(X_last)
+        return X_series
